@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIGateway", "APIGateway", "{D10257D1-677E-4D6D-8861-61715B7FB1E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.APIGateway", "ShopEase.Backend.APIGateway\ShopEase.Backend.APIGateway.csproj", "{98D4F7B1-3666-424B-B2D7-B147F272EDEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.APIGateway", "APIGateway\ShopEase.Backend.APIGateway\ShopEase.Backend.APIGateway.csproj", "{98D4F7B1-3666-424B-B2D7-B147F272EDEF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{D4F74CA5-95AE-4500-AE22-465164A5C95F}"
 EndProject
@@ -13,13 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{83
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthService", "AuthService", "{77F4E446-3A0E-42F7-B43A-2A63C07DF252}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.API", "ShopEase.Backend.AuthService.API\ShopEase.Backend.AuthService.API.csproj", "{65E0548B-6C25-4A94-BE09-7D652B634792}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.API", "Services\AuthService\ShopEase.Backend.AuthService.API\ShopEase.Backend.AuthService.API.csproj", "{65E0548B-6C25-4A94-BE09-7D652B634792}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.Application", "ShopEase.Backend.AuthService.Application\ShopEase.Backend.AuthService.Application.csproj", "{BBA2E153-D5A7-4750-9660-7B80243F46B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.Application", "Services\AuthService\ShopEase.Backend.AuthService.Application\ShopEase.Backend.AuthService.Application.csproj", "{BBA2E153-D5A7-4750-9660-7B80243F46B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.Core", "ShopEase.Backend.AuthService.Core\ShopEase.Backend.AuthService.Core.csproj", "{C8B7D666-F4AC-40B1-967F-A4EDD74CEA1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.Core", "Services\AuthService\ShopEase.Backend.AuthService.Core\ShopEase.Backend.AuthService.Core.csproj", "{C8B7D666-F4AC-40B1-967F-A4EDD74CEA1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.Infrastructure", "ShopEase.Backend.AuthService.Infrastructure\ShopEase.Backend.AuthService.Infrastructure.csproj", "{D6EEA10E-9FC1-4736-8B7E-DFE603B2DC0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopEase.Backend.AuthService.Infrastructure", "Services\AuthService\ShopEase.Backend.AuthService.Infrastructure\ShopEase.Backend.AuthService.Infrastructure.csproj", "{D6EEA10E-9FC1-4736-8B7E-DFE603B2DC0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
