@@ -1,0 +1,6 @@
+@ShopEase.Backend.APIGateway_HostAddress = http://localhost:5276
+
+GET {{ShopEase.Backend.APIGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
