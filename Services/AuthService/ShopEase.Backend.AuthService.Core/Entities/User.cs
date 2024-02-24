@@ -1,54 +1,61 @@
-﻿using ShopEase.Backend.AuthService.Core.Primitives;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShopEase.Backend.AuthService.Core.Entities
 {
     /// <summary>
     /// User Entity Class
     /// </summary>
-    public sealed class User : Entity
+    [Table("User", Schema = "Users")]
+    public sealed class User
     {
         #region Properties
 
         /// <summary>
+        /// User Id
+        /// </summary>
+        [Key]
+        public Guid Id { get; set; }
+
+        /// <summary>
         /// Full Name
         /// </summary>
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Email address
         /// </summary>
-        public string Email { get; set; }
+        [Required]
+        public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Mobile Number
         /// </summary>
-        public string MobileNumber { get; set; }
+        [Required]
+        public string MobileNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Alternate Mobile Number
         /// </summary>
-        public string? AltMobileNumber { get; set; }
-
-        #endregion
-
-        #region Constructor
+        [AllowNull]
+        public string AltMobileNumber { get; set; }
 
         /// <summary>
-        /// Constructor for User Entity
+        /// CreatedOn DateTime
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
-        /// <param name="email"></param>
-        /// <param name="mobileNumber"></param>
-        /// <param name="altMobileNubler"></param>
-        public User(Guid id, string name, string email, string mobileNumber, string? altMobileNubler) 
-            : base(id)
-        {
-            Name = name;
-            Email = email;
-            MobileNumber = mobileNumber;
-            AltMobileNumber = altMobileNubler;
-        }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// UpdatedOn DateTime
+        /// </summary>
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// RowStatus
+        /// </summary>
+        public bool RowStatus { get; set; } = true;
 
         #endregion
     }

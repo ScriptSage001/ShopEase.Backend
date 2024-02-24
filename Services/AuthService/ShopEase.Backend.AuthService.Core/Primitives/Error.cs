@@ -1,16 +1,11 @@
 ﻿namespace ShopEase.Backend.AuthService.Core.Primitives
 {
-    public class Error
+    public record Error(string Code, string Message)
     {
-        public string Code { get; set; }
-        public string Message { get; set; }
-        public object? Data { get; set; }
+        public static readonly Error None = new(string.Empty, string.Empty);
 
-        public Error(string code, string message, object? data = null)
-        {
-            Code = code;
-            Message = message;
-            Data = data;
-        }
+        public static readonly Error NullValue = new("Error.NullValue", "The specified result value is null.");
+
+        public static readonly Error ConditionNotMet = new("Error.ConditionNotMet", "The specified condition was not met.");
     }
 }

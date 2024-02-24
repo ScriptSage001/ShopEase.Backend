@@ -1,12 +1,19 @@
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Application.Helper;
+using ShopEase.Backend.AuthService.Infrastructure;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("ShopEaseDB") ?? string.Empty;
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<IAuthServiceRepository, AuthServiceRepository>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApiService).Assembly));
 builder.Services.AddScoped<IApiService, ApiService>(c =>

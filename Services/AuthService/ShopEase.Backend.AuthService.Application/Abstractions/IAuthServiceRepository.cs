@@ -1,10 +1,13 @@
 ﻿using ShopEase.Backend.AuthService.Core.Entities;
-using ShopEase.Backend.AuthService.Core.Primitives;
 
-namespace ShopEase.Backend.AuthService.Application
+namespace ShopEase.Backend.AuthService.Application.Abstractions
 {
     public interface IAuthServiceRepository
     {
-        Error RegisterUser(User user);
+        int CreateUser(User user);
+
+        void CreateUserCredentials(UserCredentials userCredentials);
+
+        UserCredentials? GetUserCredentials(string email);
     }
 }

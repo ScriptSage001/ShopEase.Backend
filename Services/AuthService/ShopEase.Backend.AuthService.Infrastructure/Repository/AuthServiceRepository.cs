@@ -1,37 +1,76 @@
-﻿using System.Data;
-using Dapper;
-using ShopEase.Backend.AuthService.Application;
+﻿using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Core.Entities;
-using ShopEase.Backend.AuthService.Core.Primitives;
-using ShopEase.Backend.AuthService.Infrastructure.Repository;
 
 namespace ShopEase.Backend.AuthService.Infrastructure
 {
+    /// <summary>
+    /// AuthService Repository
+    /// </summary>
     public class AuthServiceRepository : IAuthServiceRepository
     {
-        private readonly DbConnectionFactory _dbConnectionFactory;
+        #region Variables
 
-        public AuthServiceRepository(DbConnectionFactory dbConnectionFactory)
+        /// <summary>
+        /// Instance of AuthDbContext
+        /// </summary>
+        private readonly AuthDbContext _authDbContext;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructor for AuthServiceRepository
+        /// </summary>
+        /// <param name="authDbContext"></param>
+        public AuthServiceRepository(AuthDbContext authDbContext)
         {
-            _dbConnectionFactory = dbConnectionFactory;
+            _authDbContext = authDbContext;
         }
 
-        public Error RegisterUser(User user)
-        {
-            var dapperParams = new DynamicParameters();
-            dapperParams.Add("@Id", dbType: DbType.Guid, direction: ParameterDirection.Input);
-            dapperParams.Add("@Name", user.Name, dbType: DbType.String, direction: ParameterDirection.Input);
-            dapperParams.Add("@Email", user.Email, dbType: DbType.String, direction: ParameterDirection.Input);
-            dapperParams.Add("@MobileNumber", user.MobileNumber, dbType: DbType.String, direction: ParameterDirection.Input);
-            dapperParams.Add("@AltMobileNumber", user.AltMobileNumber, dbType: DbType.String, direction: ParameterDirection.Input);
+        #endregion
 
-            using (var connection = _dbConnectionFactory.GetConnection())
+        #region Public Methods
+
+        /// <summary>
+        /// To Create New User
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public int CreateUser(User user)
+        {
+            var existingUser = _authDbContext.User.FirstOrDefault(u => u.Email == user.Email);
+            
+            if (existingUser == null) 
             {
-                connection.Execute(StoredProcedures.RegisterUser, dapperParams, commandType: CommandType.StoredProcedure);
+                _authDbContext.User.Add(user);
+                _authDbContext.SaveChanges();
+                return 1;
             }
-
-            return new Error(" ", " ");
+            return -1;           
         }
+
+        /// <summary>
+        /// To Create New User Credentials
+        /// </summary>
+        /// <param name="userCredentials"></param>
+        public void CreateUserCredentials(UserCredentials userCredentials)
+        {
+            _authDbContext.UserCredentials.Add(userCredentials);
+            _authDbContext.SaveChanges();
+        }
+
+        /// <summary>
+        /// To fetch UserCredentials
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public UserCredentials? GetUserCredentials(string email)
+        {
+            return _authDbContext.UserCredentials.FirstOrDefault(x => x.Email == email);
+        }
+
+        #endregion
     }
 
 }
