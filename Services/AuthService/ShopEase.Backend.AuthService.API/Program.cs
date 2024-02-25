@@ -10,8 +10,11 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Adding DB Context
 var connectionString = builder.Configuration.GetConnectionString("ShopEaseDB") ?? string.Empty;
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
+
 
 builder.Services.AddScoped<IAuthServiceRepository, AuthServiceRepository>();
 

@@ -1,4 +1,5 @@
 ﻿using ShopEase.Backend.AuthService.Application.Abstractions;
+using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
 using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Core.Primitives;
@@ -6,7 +7,7 @@ using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
 namespace ShopEase.Backend.AuthService.Application.CommandHandlers
 {
-    internal sealed class LoginUserCommandHandler : ICommandHandlerAsync<LoginUserCommand>
+    internal sealed class LoginUserCommandHandler : ICommandHandler<LoginUserCommand>
     {
         #region Variables
 
@@ -45,7 +46,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task Handle(LoginUserCommand command, CancellationToken cancellationToken)
+        public Task<Result> Handle(LoginUserCommand command, CancellationToken cancellationToken)
         {
             var isVerified = _authHelper.VerifyPasswordHash(command.UserCredentials.Password,
                                             command.UserCredentials.PasswordHash,
@@ -53,16 +54,12 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
 
             if (isVerified)
             {
-                var token = _authHelper.CreateToken(command.UserCredentials.Email);
-                command.Result = token;
+                return Task.FromResult(Result.Success());
             }
             else
             {
-                command.Result = Result.Failure<string>(
-                                    new(LoginUserErrors.IncorrectPassword.Code, LoginUserErrors.IncorrectPassword.Message));
+                return Task.FromResult(Result.Failure(LoginUserErrors.IncorrectPassword));
             }
-
-            return Task.CompletedTask;
         }
 
         #endregion

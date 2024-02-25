@@ -1,5 +1,5 @@
 ﻿using ShopEase.Backend.AuthService.Application.Abstractions;
-using ShopEase.Backend.AuthService.Application.Helper;
+using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Models;
 using ShopEase.Backend.AuthService.Application.Queries;
 using ShopEase.Backend.AuthService.Core.Primitives;
@@ -7,7 +7,7 @@ using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
 namespace ShopEase.Backend.AuthService.Application.QueryHandlers
 {
-    internal sealed class GetUserCredentialsQueryHandler : IQueryHandler<GetUserCredentialsQuery, Result<UserCredentialsDto>>
+    internal sealed class GetUserCredentialsQueryHandler : IQueryHandler<GetUserCredentialsQuery, UserCredentialsDto>
     {
         #region Variables
 
@@ -33,12 +33,12 @@ namespace ShopEase.Backend.AuthService.Application.QueryHandlers
             if (userCred == null)
             {
                 return Task.FromResult(
-                    Result.Failure<UserCredentialsDto>(new(LoginUserErrors.UserDoesntExists.Code, LoginUserErrors.UserDoesntExists.Message)));
+                    Result.Failure<UserCredentialsDto>(LoginUserErrors.UserDoesntExists));
             }
             else if (!userCred.RowStatus)
             {
                 return Task.FromResult(
-                   Result.Failure<UserCredentialsDto>(new(LoginUserErrors.UserInactive.Code, LoginUserErrors.UserInactive.Message)));
+                   Result.Failure<UserCredentialsDto>(LoginUserErrors.UserInactive));
             }
 
             var response = Result.Success(new UserCredentialsDto()

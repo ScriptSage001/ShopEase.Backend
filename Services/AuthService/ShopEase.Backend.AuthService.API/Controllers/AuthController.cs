@@ -53,14 +53,25 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                 // Validate request - Fluent Validation
 
                 var command = new RegisterUserCommand(request);
-                await _apiService.SendAsync(command);
+                var registrationResult = await _apiService.SendAsync(command);
 
-                if (command.Result.IsFailure)
+                if (registrationResult.IsFailure)
                 {
-                    return BadRequest($"ErrorCode: {command.Result.Error?.Code}, ErrorMessage: {command.Result.Error?.Message}");
+                    return BadRequest($"ErrorCode: {registrationResult.Error?.Code}, ErrorMessage: {registrationResult.Error?.Message}");
                 }
-
-                return Ok($"Bearer: {command.Result.Value}");
+                else
+                {
+                    var tokenResult = await _apiService.SendAsync(new GenerateJWTCommand(request.Email));
+                    
+                    if (tokenResult.IsSuccess)
+                    {
+                        return Ok($"Bearer: {tokenResult.Value}");
+                    }
+                    else
+                    {
+                        return StatusCode(500, $"ErrorCode: {tokenResult.Error?.Code}, ErrorMessage: {tokenResult.Error?.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -97,14 +108,25 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                     userCredentials.Password = request.Password;
 
                     var command = new LoginUserCommand(userCredentials);
-                    await _apiService.SendAsync(command);
+                    var result = await _apiService.SendAsync(command);
 
-                    if (command.Result.IsFailure)
+                    if (result.IsFailure)
                     {
-                        return BadRequest($"ErrorCode: {command.Result.Error?.Code}, ErrorMessage: {command.Result.Error?.Message}");
+                        return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
                     }
+                    else
+                    {
+                        var tokenResult = await _apiService.SendAsync(new GenerateJWTCommand(request.Email));
 
-                    return Ok($"Bearer: {command.Result.Value}");
+                        if (tokenResult.IsSuccess)
+                        {
+                            return Ok($"Bearer: {tokenResult.Value}");
+                        }
+                        else
+                        {
+                            return StatusCode(500, $"ErrorCode: {tokenResult.Error?.Code}, ErrorMessage: {tokenResult.Error?.Message}");
+                        }
+                    }
                 }
 
             }

@@ -1,4 +1,5 @@
 ﻿using ShopEase.Backend.AuthService.Application.Abstractions;
+using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
 using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Core.Entities;
@@ -10,7 +11,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
     /// <summary>
     /// Handler for RegisterUserCommand
     /// </summary>
-    internal sealed class RegisterUserCommandHandler : ICommandHandlerAsync<RegisterUserCommand>
+    internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand>
     {
         #region Variables
 
@@ -49,7 +50,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public Task<Result> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             User user = new()
             {
@@ -70,19 +71,14 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
             {
                 CreateUserCredentials(command.UserRegister.Password, user.Id, user.Email);
 
-                // Generate Token
-                var token = _authHelper.CreateToken(user.Email);
-
-                command.Result = token;
+                return Task.FromResult(Result.Success());
             }
             else
             {
-                command.Result = createUserResult == -1 ? 
-                    Result.Failure<string>(new(CreateUserErrors.UserExists.Code, CreateUserErrors.UserExists.Message)) : 
-                    Result.Failure<string>(new(CreateUserErrors.InternalError.Code, CreateUserErrors.InternalError.Message));
+                return createUserResult == -1 ?
+                    Task.FromResult(Result.Failure(CreateUserErrors.UserExists)) : 
+                    Task.FromResult(Result.Failure(CreateUserErrors.InternalError));
             }
-
-            return Task.CompletedTask;
         }
 
         #endregion

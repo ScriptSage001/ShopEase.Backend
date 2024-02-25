@@ -1,6 +1,5 @@
-﻿using ShopEase.Backend.AuthService.Application.Helper;
+﻿using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Models;
-using ShopEase.Backend.AuthService.Core.Primitives;
 
 namespace ShopEase.Backend.AuthService.Application.Commands
 {
@@ -8,16 +7,11 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// Command for User Login
     /// </summary>
     /// <param name="userLogin"></param>
-    public record LoginUserCommand(UserCredentialsDto userCredentials) : ICommandAsync
+    public sealed record LoginUserCommand(UserCredentialsDto userCredentials) : ICommand
     {
         /// <summary>
         /// UserCredentials DTO
         /// </summary>
         public UserCredentialsDto UserCredentials { get; set; } = userCredentials;
-
-        /// <summary>
-        /// Result Object
-        /// </summary>
-        public Result<string> Result { get; set; }
     }
 }
