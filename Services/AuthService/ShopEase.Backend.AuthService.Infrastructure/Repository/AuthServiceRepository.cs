@@ -39,9 +39,9 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         /// <returns></returns>
         public int CreateUser(User user)
         {
-            var existingUser = _authDbContext.User.FirstOrDefault(u => u.Email == user.Email);
+            var existingUser = _authDbContext.User.Any(u => u.Email == user.Email);
             
-            if (existingUser == null) 
+            if (!existingUser)
             {
                 _authDbContext.User.Add(user);
                 _authDbContext.SaveChanges();
@@ -68,6 +68,26 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         public UserCredentials? GetUserCredentials(string email)
         {
             return _authDbContext.UserCredentials.FirstOrDefault(x => x.Email == email);
+        }
+
+        /// <summary>
+        /// To fetch UserCredentials
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public UserCredentials? GetUserCredentials(Guid userId)
+        {
+            return _authDbContext.UserCredentials.FirstOrDefault(x => x.UserId == userId);
+        }
+
+        /// <summary>
+        /// To Update UserCredentials
+        /// </summary>
+        /// <param name="userCredentials"></param>
+        public void UpdateUserCredentials(UserCredentials userCredentials)
+        {
+            _authDbContext.UserCredentials.Update(userCredentials);
+            _authDbContext.SaveChanges();
         }
 
         #endregion

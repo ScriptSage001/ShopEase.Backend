@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopEase.Backend.AuthService.Application.Commands;
 using ShopEase.Backend.AuthService.Application.Helper;
@@ -6,6 +7,9 @@ using ShopEase.Backend.AuthService.Application.Queries;
 
 namespace ShopEase.Backend.AuthService.API.Controllers
 {
+    /// <summary>
+    /// Controller for Auth Services
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -46,6 +50,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         [Route("register")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto request)
         {
             try
@@ -65,7 +70,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                     
                     if (tokenResult.IsSuccess)
                     {
-                        return Ok($"Bearer: {tokenResult.Value}");
+                        return Ok(tokenResult.Value);
                     }
                     else
                     {
@@ -90,6 +95,8 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         [Route("login")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] UserLoginDto request)
         {
             try
@@ -112,7 +119,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
                     if (result.IsFailure)
                     {
-                        return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+                        return Unauthorized($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
                     }
                     else
                     {
@@ -120,7 +127,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
                         if (tokenResult.IsSuccess)
                         {
-                            return Ok($"Bearer: {tokenResult.Value}");
+                            return Ok(tokenResult.Value);
                         }
                         else
                         {
@@ -133,6 +140,111 @@ namespace ShopEase.Backend.AuthService.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Exception occured during Login. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
+        /// <summary>
+        /// To Refresh Tokens
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("refresh")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            try
+            {
+                // Validate request - Fluent Validation
+                var refreshResult = await _apiService.SendAsync(new RefreshTokenCommand(request));
+
+                if (refreshResult.IsFailure)
+                {
+                    return Unauthorized($"ErrorCode: {refreshResult.Error?.Code}, ErrorMessage: {refreshResult.Error?.Message}");
+                }
+                else
+                {
+                    return Ok(refreshResult.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during Token Refresh. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
+        /// <summary>
+        /// To Revoke Refresh Tokens by User Email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost]
+        [Route("revoke/{email}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> RevokeRefreshToken(string email)
+        {
+            try
+            {
+                // Validate request - Fluent Validation
+                var revokeResult = await _apiService.SendAsync(new RevokeRefreshTokenCommand(null, email));
+
+                if (revokeResult.IsFailure)
+                {
+                    return Unauthorized($"ErrorCode: {revokeResult.Error?.Code}, ErrorMessage: {revokeResult.Error?.Message}");
+                }
+                else
+                {
+                    return Ok(revokeResult);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during Revoke Refresh Token. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
+        /// <summary>
+        /// To Revoke Refresh Tokens by User Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost]
+        [Route("revoke/{id:Guid}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> RevokeRefreshToken(Guid id)
+        {
+            try
+            {
+                // Validate request - Fluent Validation
+                var revokeResult = await _apiService.SendAsync(new RevokeRefreshTokenCommand(id, null));
+
+                if (revokeResult.IsFailure)
+                {
+                    return Unauthorized($"ErrorCode: {revokeResult.Error?.Code}, ErrorMessage: {revokeResult.Error?.Message}");
+                }
+                else
+                {
+                    return Ok(revokeResult);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during Revoke Refresh Token. Message: {ex.Message}. " +
                                     $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
                 // Tech Debt - Add logging, reduce details from return statement.
             }

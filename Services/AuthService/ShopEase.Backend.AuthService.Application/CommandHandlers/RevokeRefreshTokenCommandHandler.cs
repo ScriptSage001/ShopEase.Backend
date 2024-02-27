@@ -1,20 +1,14 @@
 ﻿using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
-using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Core.Primitives;
 using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
 namespace ShopEase.Backend.AuthService.Application.CommandHandlers
 {
-    internal sealed class LoginUserCommandHandler : ICommandHandler<LoginUserCommand>
+    internal sealed class RevokeRefreshTokenCommandHandler : ICommandHandler<RevokeRefreshTokenCommand>
     {
         #region Variables
-
-        /// <summary>
-        /// Instance of AuthHelper
-        /// </summary>
-        private readonly IAuthHelper _authHelper;
 
         /// <summary>
         /// Instance of AuthServiceRepository
@@ -26,13 +20,11 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         #region Constructor
 
         /// <summary>
-        /// Constructor for LoginUserCommandHandler
+        /// Constructor for RevokeRefreshTokenCommandHandler
         /// </summary>
-        /// <param name="authHelper"></param>
         /// <param name="authServiceRepository"></param>
-        public LoginUserCommandHandler(IAuthHelper authHelper, IAuthServiceRepository authServiceRepository)
+        public RevokeRefreshTokenCommandHandler(IAuthServiceRepository authServiceRepository)
         {
-            _authHelper = authHelper;
             _authServiceRepository = authServiceRepository;
         }
 
@@ -41,24 +33,29 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         #region Handle Method
 
         /// <summary>
-        /// Handle method for LoginUserCommand
+        /// Handle Method for RevokeRefreshTokenCommand
         /// </summary>
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<Result> Handle(LoginUserCommand command, CancellationToken cancellationToken)
+        public Task<Result> Handle(RevokeRefreshTokenCommand command, CancellationToken cancellationToken)
         {
-            var isVerified = _authHelper.VerifyPasswordHash(command.UserCredentials.Password,
-                                                            command.UserCredentials.PasswordHash,
-                                                            command.UserCredentials.PasswordSalt);
+            var userCreds = command.userId != null ? 
+                                    _authServiceRepository.GetUserCredentials((Guid)command.UserId) : 
+                                    _authServiceRepository.GetUserCredentials(command.Email);
 
-            if (isVerified)
+            if (userCreds != null)
             {
+                userCreds.RefreshToken = null;
+                userCreds.UpdatedOn = DateTime.Now;
+
+                _authServiceRepository.UpdateUserCredentials(userCreds);
+
                 return Task.FromResult(Result.Success());
             }
             else
             {
-                return Task.FromResult(Result.Failure(LoginUserErrors.IncorrectPassword));
+                return Task.FromResult(Result.Failure(AuthErrors.RevokeRefreshTokenFailed));
             }
         }
 

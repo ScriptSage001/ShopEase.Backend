@@ -42,6 +42,16 @@ namespace ShopEase.Backend.AuthService.Core.Entities
         public byte[] PasswordSalt { get; set; } = new byte[32];
 
         /// <summary>
+        /// Refresh Token
+        /// </summary>
+        public string? RefreshToken { get; set; } = null;
+
+        /// <summary>
+        /// Refresh Token Expiration Time
+        /// </summary>
+        public DateTime RefreshTokenExpirationTime { get; set; } = DateTime.Now;
+
+        /// <summary>
         /// CreatedOn DateTime
         /// </summary>
         public DateTime CreatedOn { get; set; } = DateTime.Now;

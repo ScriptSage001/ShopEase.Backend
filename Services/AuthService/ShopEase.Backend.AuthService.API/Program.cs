@@ -43,7 +43,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(s =>
+{
+    s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "ShopEase AuthServices API",
+        Version = "v1",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Kaustab Samanta",
+            Email = "scriptsage001@gmail.com",
+            Url = new Uri("https://www.linkedin.com/in/kaustab-samanta-b513511a1")
+        }
+    });
+});
 
 var app = builder.Build();
 

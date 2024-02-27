@@ -1,4 +1,5 @@
 ﻿using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
+using ShopEase.Backend.AuthService.Application.Models;
 
 namespace ShopEase.Backend.AuthService.Application.Commands
 {
@@ -6,7 +7,7 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// Command to Generate new JWT
     /// </summary>
     /// <param name="email"></param>
-    public sealed record GenerateJWTCommand(string email) : ICommand<string>
+    public sealed record GenerateJWTCommand(string email) : ICommand<TokenModel>
     {
         /// <summary>
         /// Users Email

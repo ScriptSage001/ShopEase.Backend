@@ -1,6 +1,7 @@
 ﻿using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
 using ShopEase.Backend.AuthService.Application.Helper;
+using ShopEase.Backend.AuthService.Application.Models;
 using ShopEase.Backend.AuthService.Core.Primitives;
 using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
@@ -9,7 +10,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
     /// <summary>
     /// Hnadler for GenerateJWTCommand
     /// </summary>
-    internal sealed class GenerateJWTCommandHandler : ICommandHandler<GenerateJWTCommand, string>
+    internal sealed class GenerateJWTCommandHandler : ICommandHandler<GenerateJWTCommand, TokenModel>
     {
         #region Variables
 
@@ -41,14 +42,14 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<Result<string>> Handle(GenerateJWTCommand command, CancellationToken cancellationToken)
+        public Task<Result<TokenModel>> Handle(GenerateJWTCommand command, CancellationToken cancellationToken)
         {
             // Generate Token
             var token = _authHelper.CreateToken(command.Email);
 
             if (token == null)
             {
-                return Task.FromResult(Result.Failure<string>(AuthErrors.JwtGenerationFailed));
+                return Task.FromResult(Result.Failure<TokenModel>(AuthErrors.JwtGenerationFailed));
             }
             return Task.FromResult(Result.Success(token));
         }

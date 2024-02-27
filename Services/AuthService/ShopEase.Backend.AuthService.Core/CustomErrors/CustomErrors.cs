@@ -20,6 +20,8 @@ namespace ShopEase.Backend.AuthService.Core.CustomErrors
         public struct AuthErrors
         {
             public static Error JwtGenerationFailed = new("JwtGenerationFailed", "Jwt Generation Failed.");
+            public static Error TokenRefreshFailed = new("TokenRefreshFailed", "Token Refresh Failed Due to Invalid Access or Refresh Token.");
+            public static Error RevokeRefreshTokenFailed = new("RevokeRefreshTokenFailed", "Revoke Refresh Token Failed due to Incorrect Credentials.");
         }
     }
 }
