@@ -50,7 +50,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<Result> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<Result> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             User user = new()
             {
@@ -65,19 +65,19 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
             };
 
             // Tech Debt - Move User to UserService
-            var createUserResult = _authServiceRepository.CreateUser(user);
+            var createUserResult = await _authServiceRepository.CreateUserAsync(user);
 
             if (createUserResult > 0)
             {
-                CreateUserCredentials(command.UserRegister.Password, user.Id, user.Email);
+                await CreateUserCredentials(command.UserRegister.Password, user.Id, user.Email);
 
-                return Task.FromResult(Result.Success());
+                return Result.Success();
             }
             else
             {
                 return createUserResult == -1 ?
-                    Task.FromResult(Result.Failure(CreateUserErrors.UserExists)) : 
-                    Task.FromResult(Result.Failure(CreateUserErrors.InternalError));
+                    Result.Failure(CreateUserErrors.UserExists) : 
+                    Result.Failure(CreateUserErrors.InternalError);
             }
         }
 
@@ -91,7 +91,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="password"></param>
         /// <param name="userId"></param>
         /// <param name="email"></param>
-        private void CreateUserCredentials(string password, Guid userId, string email)
+        private async Task CreateUserCredentials(string password, Guid userId, string email)
         {
             _authHelper.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
@@ -104,7 +104,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
                 PasswordSalt = passwordSalt
             };
 
-            _authServiceRepository.CreateUserCredentials(userCredentials);
+            await _authServiceRepository.CreateUserCredentialsAsync(userCredentials);
         }
 
         #endregion

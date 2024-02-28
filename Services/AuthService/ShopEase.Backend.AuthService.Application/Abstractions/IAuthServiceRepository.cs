@@ -12,13 +12,13 @@ namespace ShopEase.Backend.AuthService.Application.Abstractions
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        int CreateUser(User user);
+        Task<int> CreateUserAsync(User user);
 
         /// <summary>
         /// To Create New User Credentials
         /// </summary>
         /// <param name="userCredentials"></param>
-        void CreateUserCredentials(UserCredentials userCredentials);
+        Task CreateUserCredentialsAsync(UserCredentials userCredentials);
 
         /// <summary>
         /// To fetch UserCredentials
@@ -38,6 +38,6 @@ namespace ShopEase.Backend.AuthService.Application.Abstractions
         /// To Update UserCredentials
         /// </summary>
         /// <param name="userCredentials"></param>
-        void UpdateUserCredentials(UserCredentials userCredentials);
+        Task UpdateUserCredentialsAsync(UserCredentials userCredentials);
     }
 }

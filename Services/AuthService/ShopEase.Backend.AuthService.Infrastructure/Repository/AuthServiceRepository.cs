@@ -1,4 +1,5 @@
-﻿using ShopEase.Backend.AuthService.Application.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Core.Entities;
 
 namespace ShopEase.Backend.AuthService.Infrastructure
@@ -37,14 +38,14 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public int CreateUser(User user)
+        public async Task<int> CreateUserAsync(User user)
         {
             var existingUser = _authDbContext.User.Any(u => u.Email == user.Email);
             
             if (!existingUser)
             {
-                _authDbContext.User.Add(user);
-                _authDbContext.SaveChanges();
+                await _authDbContext.User.AddAsync(user);
+                await _authDbContext.SaveChangesAsync();
                 return 1;
             }
             return -1;           
@@ -54,14 +55,14 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         /// To Create New User Credentials
         /// </summary>
         /// <param name="userCredentials"></param>
-        public void CreateUserCredentials(UserCredentials userCredentials)
+        public async Task CreateUserCredentialsAsync(UserCredentials userCredentials)
         {
-            _authDbContext.UserCredentials.Add(userCredentials);
-            _authDbContext.SaveChanges();
+            await _authDbContext.UserCredentials.AddAsync(userCredentials);
+            await _authDbContext.SaveChangesAsync();
         }
 
         /// <summary>
-        /// To fetch UserCredentials
+        /// To fetch UserCredentials By User Email
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
@@ -71,7 +72,7 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         }
 
         /// <summary>
-        /// To fetch UserCredentials
+        /// To fetch UserCredentials By User Id
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
@@ -84,10 +85,10 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         /// To Update UserCredentials
         /// </summary>
         /// <param name="userCredentials"></param>
-        public void UpdateUserCredentials(UserCredentials userCredentials)
+        public async Task UpdateUserCredentialsAsync(UserCredentials userCredentials)
         {
             _authDbContext.UserCredentials.Update(userCredentials);
-            _authDbContext.SaveChanges();
+            await _authDbContext.SaveChangesAsync();
         }
 
         #endregion

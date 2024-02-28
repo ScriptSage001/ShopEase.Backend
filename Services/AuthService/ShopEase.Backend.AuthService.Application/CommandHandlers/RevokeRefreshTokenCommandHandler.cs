@@ -38,7 +38,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<Result> Handle(RevokeRefreshTokenCommand command, CancellationToken cancellationToken)
+        public async Task<Result> Handle(RevokeRefreshTokenCommand command, CancellationToken cancellationToken)
         {
             var userCreds = command.userId != null ? 
                                     _authServiceRepository.GetUserCredentials((Guid)command.UserId) : 
@@ -49,13 +49,13 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
                 userCreds.RefreshToken = null;
                 userCreds.UpdatedOn = DateTime.Now;
 
-                _authServiceRepository.UpdateUserCredentials(userCreds);
+                await _authServiceRepository.UpdateUserCredentialsAsync(userCreds);
 
-                return Task.FromResult(Result.Success());
+                return Result.Success();
             }
             else
             {
-                return Task.FromResult(Result.Failure(AuthErrors.RevokeRefreshTokenFailed));
+                return Result.Failure(AuthErrors.RevokeRefreshTokenFailed);
             }
         }
 

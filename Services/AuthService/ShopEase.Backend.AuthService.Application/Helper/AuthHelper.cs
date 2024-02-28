@@ -103,7 +103,7 @@ namespace ShopEase.Backend.AuthService.Application.Helper
                 userCreds.RefreshTokenExpirationTime = DateTime.Now.AddDays(refreshTokenExpirationTime == 0 ? 7 : refreshTokenExpirationTime);
                 userCreds.UpdatedOn = DateTime.Now;
 
-                _authServiceRepository.UpdateUserCredentials(userCreds);
+                _authServiceRepository.UpdateUserCredentialsAsync(userCreds);
 
                 return new TokenModel() 
                 { 
@@ -145,7 +145,7 @@ namespace ShopEase.Backend.AuthService.Application.Helper
                 userCreds.RefreshTokenExpirationTime = DateTime.Now.AddDays(refreshTokenExpirationTime == 0 ? 7 : refreshTokenExpirationTime);
                 userCreds.UpdatedOn = DateTime.Now;
 
-                _authServiceRepository.UpdateUserCredentials(userCreds);
+                _authServiceRepository.UpdateUserCredentialsAsync(userCreds);
 
                 return new TokenModel()
                 {
