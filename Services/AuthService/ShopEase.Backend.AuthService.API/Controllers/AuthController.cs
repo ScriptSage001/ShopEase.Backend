@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
-using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Application.Models;
 using ShopEase.Backend.AuthService.Application.Queries;
 
@@ -20,8 +20,6 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         /// Instance of IApiService
         /// </summary>
         private readonly IApiService _apiService;
-
-        
 
         #endregion
 
@@ -55,7 +53,10 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         {
             try
             {
-                // Validate request - Fluent Validation
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: RequestEmpty, ErrorMessage: Request is empty. Please provide valid request.");
+                }
 
                 var command = new RegisterUserCommand(request);
                 var registrationResult = await _apiService.SendAsync(command);
@@ -101,7 +102,10 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         {
             try
             {
-                // Validate request - Fluent Validation
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: RequestEmpty, ErrorMessage: Request is empty. Please provide valid request.");
+                }
 
                 var userCredsResult = await _apiService.RequestAsync(new GetUserCredentialsQuery(request.Email));
 
@@ -160,7 +164,11 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         {
             try
             {
-                // Validate request - Fluent Validation
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: RequestEmpty, ErrorMessage: Request is empty. Please provide valid request.");
+                }
+
                 var refreshResult = await _apiService.SendAsync(new RefreshTokenCommand(request));
 
                 if (refreshResult.IsFailure)
@@ -195,7 +203,11 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         {
             try
             {
-                // Validate request - Fluent Validation
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest($"ErrorCode: InvalidEmail, ErrorMessage: Please provide valid UserEmail.");
+                }
+
                 var revokeResult = await _apiService.SendAsync(new RevokeRefreshTokenCommand(null, email));
 
                 if (revokeResult.IsFailure)
@@ -230,7 +242,11 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         {
             try
             {
-                // Validate request - Fluent Validation
+                if (id == Guid.Empty)
+                {
+                    return BadRequest($"ErrorCode: InvalidUserId, ErrorMessage: Please provide valid UserId.");
+                }
+
                 var revokeResult = await _apiService.SendAsync(new RevokeRefreshTokenCommand(id, null));
 
                 if (revokeResult.IsFailure)

@@ -2,7 +2,7 @@
 
 namespace ShopEase.Backend.AuthService.Core.CustomErrors
 {
-    public static class CustomErrors
+    public class CustomErrors
     {
         public struct CreateUserErrors
         {

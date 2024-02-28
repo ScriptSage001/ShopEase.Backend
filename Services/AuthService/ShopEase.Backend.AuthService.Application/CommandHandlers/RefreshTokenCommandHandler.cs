@@ -1,7 +1,7 @@
 ﻿using MediatR;
+using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
-using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Application.Models;
 using ShopEase.Backend.AuthService.Core.Primitives;
 using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
