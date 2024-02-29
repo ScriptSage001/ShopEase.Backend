@@ -73,7 +73,9 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
                     if (tokenResult.IsSuccess)
                     {
-
+                        #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                        _apiService.SendAsync(new SendWelcomeMailCommand(request.Name, request.Email));
+                        #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                         return Ok(tokenResult.Value);
                     }
