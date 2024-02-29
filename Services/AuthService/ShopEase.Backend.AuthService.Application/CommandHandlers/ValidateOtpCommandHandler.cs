@@ -45,16 +45,16 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <returns></returns>
         public async Task<Result> Handle(ValidateOtpCommand command, CancellationToken cancellationToken)
         {
-            var userOtpDetails = _authServiceRepository.GetUserOtpDetails(command.request.Email);
+            var userOtpDetails = _authServiceRepository.GetUserOtpDetails(command.Request.Email);
 
             if (userOtpDetails == null)
             {
                 return Result.Failure(OtpErrors.ValidationFailed);
             }
 
-            if (IsOtpValid(command.request, userOtpDetails))
+            if (IsOtpValid(command.Request, userOtpDetails))
             {
-                await _authServiceRepository.DeleteUserOtpDetailsAsync(command.request.Email);
+                await _authServiceRepository.DeleteUserOtpDetailsAsync(command.Request.Email);
 
                 return Result.Success();
             }

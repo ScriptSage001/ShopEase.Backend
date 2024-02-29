@@ -75,7 +75,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
 
                 await _emailService.SendMailAsync(mailRequest);
 
-                await SaveOtpDetails(command.email, otp);
+                await SaveOtpDetails(command.Email, otp);
 
                 return Result.Success();
             }

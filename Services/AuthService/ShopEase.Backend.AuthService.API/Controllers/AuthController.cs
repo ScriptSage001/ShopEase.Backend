@@ -73,6 +73,8 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
                     if (tokenResult.IsSuccess)
                     {
+
+
                         return Ok(tokenResult.Value);
                     }
                     else
