@@ -39,6 +39,8 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
         #region Public EndPoints
 
+        #region Register & Login
+
         /// <summary>
         /// To Register new user
         /// </summary>
@@ -68,7 +70,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                 else
                 {
                     var tokenResult = await _apiService.SendAsync(new GenerateJWTCommand(request.Email));
-                    
+
                     if (tokenResult.IsSuccess)
                     {
                         return Ok(tokenResult.Value);
@@ -149,6 +151,10 @@ namespace ShopEase.Backend.AuthService.API.Controllers
             }
         }
 
+        #endregion
+
+        #region Refresh Token
+
         /// <summary>
         /// To Refresh Tokens
         /// </summary>
@@ -194,7 +200,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [Authorize]
-        [HttpPost]
+        [HttpPut]
         [Route("revoke/{email}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -233,7 +239,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Authorize]
-        [HttpPost]
+        [HttpPut]
         [Route("revoke/{id:Guid}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -265,6 +271,80 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                 // Tech Debt - Add logging, reduce details from return statement.
             }
         }
+
+        #endregion
+
+        #region OTP
+
+        /// <summary>
+        /// To Generate Otp
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("otp/generate/{email}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GenerateOtp(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest($"ErrorCode: InvalidEmail, ErrorMessage: Please provide valid UserEmail.");
+                }
+
+                var result = await _apiService.SendAsync(new SendOtpCommand(email));
+
+                if (result.IsSuccess)
+                {
+                    return Ok($"Otp sent successfully to the following email address: {email}");
+                }
+
+                return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// To Validate Otp
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("otp/validate")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ValidateOtp(ValidateOtpRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: InvalidRequest, ErrorMessage: Please provide valid Request.");
+                }
+
+                var result = await _apiService.SendAsync(new ValidateOtpCommand(request));
+
+                if (result.IsSuccess)
+                {
+                    return Ok($"Otp validated successfully.");
+                }
+
+                return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        #endregion
 
         #endregion
     }

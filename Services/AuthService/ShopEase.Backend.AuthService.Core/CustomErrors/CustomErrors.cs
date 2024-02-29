@@ -23,5 +23,10 @@ namespace ShopEase.Backend.AuthService.Core.CustomErrors
             public static Error TokenRefreshFailed = new("TokenRefreshFailed", "Token Refresh Failed Due to Invalid Access or Refresh Token.");
             public static Error RevokeRefreshTokenFailed = new("RevokeRefreshTokenFailed", "Revoke Refresh Token Failed due to Incorrect Credentials.");
         }
+
+        public struct OtpErrors
+        {
+            public static Error ValidationFailed = new("ValidationFailed", "OTP Validation Failed, Please Try Again.");
+        }
     }
 }

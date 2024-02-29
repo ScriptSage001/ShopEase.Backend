@@ -6,9 +6,13 @@ using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Infrastructure;
+using ShopEase.Backend.AuthService.Infrastructure.MailService;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 // Add services to the container.
 
@@ -16,9 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ShopEaseDB") ?? string.Empty;
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
 
-
+// Adding Repository
 builder.Services.AddScoped<IAuthServiceRepository, AuthServiceRepository>();
 
+// Adding Mediator
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApiService).Assembly));
 builder.Services.AddScoped<IApiService, ApiService>(c =>
 {
@@ -26,9 +31,12 @@ builder.Services.AddScoped<IApiService, ApiService>(c =>
     return new ApiService(mediator);
 });
 
+// Adding Auth Helper
 builder.Services.AddScoped<IAuthHelper, AuthHelper>();
 
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+// Adding Email Service
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

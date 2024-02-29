@@ -8,5 +8,7 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         public DbSet<User> User { get; set; }
 
         public DbSet<UserCredentials> UserCredentials { get; set; }
+
+        public DbSet<UserOtpDetails> UserOtpDetails { get; set; }
     }
 }

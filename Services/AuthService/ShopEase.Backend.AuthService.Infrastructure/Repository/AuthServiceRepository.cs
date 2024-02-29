@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Core.Entities;
+using System.Xml.Schema;
 
 namespace ShopEase.Backend.AuthService.Infrastructure
 {
@@ -89,6 +90,54 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         {
             _authDbContext.UserCredentials.Update(userCredentials);
             await _authDbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// To Create UserOtpDetail
+        /// </summary>
+        /// <param name="userOtpDetails"></param>
+        /// <returns></returns>
+        public async Task CreateUserOtpDetailAsync(UserOtpDetails userOtpDetails)
+        {
+            await _authDbContext.UserOtpDetails.AddAsync(userOtpDetails);
+            await _authDbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// To Update UserOtpDetail
+        /// </summary>
+        /// <param name="userOtpDetails"></param>
+        /// <returns></returns>
+        public async Task UpdateUserOtpDetailAsync(UserOtpDetails userOtpDetails)
+        {
+            _authDbContext.UserOtpDetails.Update(userOtpDetails);
+            await _authDbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// To Get UserOTP Details
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public UserOtpDetails? GetUserOtpDetails(string email)
+        {
+            return _authDbContext
+                        .UserOtpDetails
+                        .AsNoTracking()
+                        .OrderByDescending(o => o.CreatedOn)
+                        .FirstOrDefault(x => x.Email == email);
+        }
+
+        /// <summary>
+        /// To Delete UserOtpDetails
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public async Task DeleteUserOtpDetailsAsync(string email)
+        {
+            await _authDbContext.UserOtpDetails
+                                    .Where(o => o.Email == email)
+                                    .ExecuteDeleteAsync();
         }
 
         #endregion

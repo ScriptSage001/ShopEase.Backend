@@ -39,5 +39,33 @@ namespace ShopEase.Backend.AuthService.Application.Abstractions
         /// </summary>
         /// <param name="userCredentials"></param>
         Task UpdateUserCredentialsAsync(UserCredentials userCredentials);
+
+        /// <summary>
+        /// To Create UserOtpDetail
+        /// </summary>
+        /// <param name="userOtpDetails"></param>
+        /// <returns></returns>
+        Task CreateUserOtpDetailAsync(UserOtpDetails userOtpDetails);
+
+        /// <summary>
+        /// To Update UserOtpDetail
+        /// </summary>
+        /// <param name="userOtpDetails"></param>
+        /// <returns></returns>
+        Task UpdateUserOtpDetailAsync(UserOtpDetails userOtpDetails);
+
+        /// <summary>
+        /// To Get UserOTP Details
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        UserOtpDetails? GetUserOtpDetails(string email);
+
+        /// <summary>
+        /// To Delete UserOtpDetails
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        Task DeleteUserOtpDetailsAsync(string email);
     }
 }
