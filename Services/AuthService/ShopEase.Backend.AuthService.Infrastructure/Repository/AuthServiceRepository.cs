@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Core.Entities;
+using System.Security;
 using System.Xml.Schema;
 
 namespace ShopEase.Backend.AuthService.Infrastructure
@@ -69,7 +70,12 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         /// <returns></returns>
         public UserCredentials? GetUserCredentials(string email)
         {
-            return _authDbContext.UserCredentials.FirstOrDefault(x => x.Email == email);
+            return _authDbContext
+                        .UserCredentials
+                        .AsNoTracking()
+                        .FirstOrDefault(x => 
+                                x.Email == email
+                            &&  x.RowStatus == true);
         }
 
         /// <summary>
@@ -79,7 +85,27 @@ namespace ShopEase.Backend.AuthService.Infrastructure
         /// <returns></returns>
         public UserCredentials? GetUserCredentials(Guid userId)
         {
-            return _authDbContext.UserCredentials.FirstOrDefault(x => x.UserId == userId);
+            return _authDbContext
+                        .UserCredentials
+                        .AsNoTracking()
+                        .FirstOrDefault(x =>
+                                x.UserId == userId
+                            && x.RowStatus == true);
+        }
+
+        /// <summary>
+        /// To check if user exists By User Email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public bool IsUserExists(string email)
+        {
+            return _authDbContext
+                        .UserCredentials
+                        .AsNoTracking()
+                        .Any(x => 
+                                x.Email == email 
+                            &&  x.RowStatus == true);
         }
 
         /// <summary>

@@ -37,6 +37,21 @@ namespace ShopEase.Backend.AuthService.Application.Abstractions
         /// <param name="request"></param>
         /// <returns></returns>
         TokenModel? RefreshToken(RefreshTokenRequest request);
+
+        /// <summary>
+        /// To Generate Reset Password Token
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        string GenerateResetPasswordToken(string email);
+
+        /// <summary>
+        /// To Verify Reset Password Token
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        bool VerifyResetPasswordToken(string email, string token);
     }
 
 }

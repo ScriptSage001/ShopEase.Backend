@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Application.Models;
@@ -7,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static ShopEase.Backend.AuthService.Core.CommonConstants.TokenConstants;
 
 namespace ShopEase.Backend.AuthService.Application.Helper
 {
@@ -16,11 +16,6 @@ namespace ShopEase.Backend.AuthService.Application.Helper
     public class AuthHelper : IAuthHelper
     {
         #region Variables
-
-        /// <summary>
-        /// Instance of IConfiguration
-        /// </summary>
-        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// Instance of AppSettings
@@ -39,12 +34,10 @@ namespace ShopEase.Backend.AuthService.Application.Helper
         /// <summary>
         /// Constructor for AuthHelper Class
         /// </summary>
-        /// <param name="configuration"></param>
         /// <param name="appSettings"></param>
         /// <param name="authServiceRepository"></param>
-        public AuthHelper(IConfiguration configuration, IOptions<AppSettings> appSettings, IAuthServiceRepository authServiceRepository)
+        public AuthHelper(IOptions<AppSettings> appSettings, IAuthServiceRepository authServiceRepository)
         {
-            _configuration = configuration;
             _appSettings = appSettings.Value;
             _authServiceRepository = authServiceRepository;
         }
@@ -128,7 +121,7 @@ namespace ShopEase.Backend.AuthService.Application.Helper
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(accessToken);
-            var userEmail = jwtToken.Claims.First(c => c.Type == "email").Value;
+            var userEmail = jwtToken.Claims.First(c => c.Type == ClaimType.Email).Value;
 
             var userCreds = _authServiceRepository.GetUserCredentials(userEmail);
 
@@ -156,6 +149,61 @@ namespace ShopEase.Backend.AuthService.Application.Helper
             }
         }
 
+        /// <summary>
+        /// To Generate Reset Password Token
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public string GenerateResetPasswordToken(string email)
+        {
+            List<Claim> claims =
+            [
+                new Claim(ClaimType.Email, email),
+                new Claim(ClaimType.TokenType, ClaimTypeValue.ResetPassword)
+            ];
+
+            var key = Encoding.UTF8.GetBytes(_appSettings.Secret);
+            int.TryParse(_appSettings.ResetPasswordTokenExpirationTimeInMin, out int tokenExpirationTime);
+
+            var securityKey = new SymmetricSecurityKey(key);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
+
+            var tokenDescriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(claims.ToArray()),
+                Issuer = _appSettings.Issuer,
+                NotBefore = DateTime.Now,
+                Expires = DateTime.Now.AddMinutes(tokenExpirationTime == 0 ? 5 : tokenExpirationTime),
+                SigningCredentials = credentials
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            string jwt = tokenHandler.WriteToken(token);
+
+            return jwt;
+        }
+
+        /// <summary>
+        /// To Verify Reset Password Token
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool VerifyResetPasswordToken(string email, string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            var userEmail = jwtToken.Claims.First(c => c.Type == ClaimType.Email)?.Value;
+            var tokenType = jwtToken.Claims.First(c => c.Type == ClaimType.TokenType)?.Value;
+            var expiresOn = jwtToken.ValidTo;
+
+            return (email.Equals(userEmail, StringComparison.OrdinalIgnoreCase) 
+                        && ClaimTypeValue.ResetPassword.Equals(tokenType, StringComparison.OrdinalIgnoreCase) 
+                        && expiresOn >= DateTime.Now);
+        }
+
         #endregion
 
         #region Private Methods
@@ -170,7 +218,7 @@ namespace ShopEase.Backend.AuthService.Application.Helper
         {
             List<Claim> claims =
             [
-                new Claim(ClaimTypes.Email, email)
+                new Claim(ClaimType.Email, email)
             ];
 
             var key = Encoding.UTF8.GetBytes(_appSettings.Secret);

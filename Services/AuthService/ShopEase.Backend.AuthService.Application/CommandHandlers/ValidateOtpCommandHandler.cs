@@ -72,7 +72,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <param name="request"></param>
         /// <param name="userOtpDetails"></param>
         /// <returns></returns>
-        private bool IsOtpValid(ValidateOtpRequest request, UserOtpDetails userOtpDetails)
+        private static bool IsOtpValid(ValidateOtpRequest request, UserOtpDetails userOtpDetails)
         {
             return request.Otp.Equals(userOtpDetails.Otp) && userOtpDetails.OtpExpiresOn >= DateTime.Now;
         }

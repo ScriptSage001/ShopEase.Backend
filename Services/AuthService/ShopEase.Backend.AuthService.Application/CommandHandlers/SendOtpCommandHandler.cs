@@ -65,12 +65,35 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
             try
             {
                 var otp = GenerateOtp();
+                var subject = string.Empty;
+                var body = string.Empty;
+
+                switch (command.OtpType) 
+                {
+                    case OTPType.VerifyEmail:
+                        subject = Subject.VerifyEmailOtp;
+                        body = PrepareEmailBodyForEmailVerification(otp);
+                        break;
+                    
+                    case OTPType.ResetPassword:
+                        subject = Subject.ResetPasswordOtp;
+                        body = PrepareEmailBodyForPasswordReset(otp);
+                        break;
+
+                    case OTPType.Login:
+                        subject = Subject.LoginOtp;
+                        body = PrepareEmailBodyForLogin(otp);
+                        break;
+                    
+                    default:
+                        break;
+                }
 
                 MailRequest mailRequest = new()
                 {
                     Recipients = [command.Email],
-                    Subject = Subject.Otp,
-                    Body = GenerateEmailBody(otp)
+                    Subject = subject,
+                    Body = body
                 };
 
                 await _emailService.SendMailAsync(mailRequest);
@@ -101,11 +124,11 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         }
 
         /// <summary>
-        /// TO Prepare the Email Body
+        /// To Prepare the Email Body for VerifyEmail Scenario
         /// </summary>
         /// <param name="otp"></param>
         /// <returns></returns>
-        private string GenerateEmailBody(string otp)
+        private string PrepareEmailBodyForEmailVerification(string otp)
         {
             StringBuilder stringBuilder = new StringBuilder();
             
@@ -116,6 +139,56 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
             stringBuilder.Append("<p>Thank you for signing up with ShopEase! To verify your email address, please use the following OTP: </p><h3> {otp} </h3>");
             stringBuilder.Append("<br/><p>This OTP is valid for only {otpLifeSpan} minutes.</p>");
             stringBuilder.Append("<p>If you didn't sign up for an account with us, you can safely ignore this email.</p>");
+            stringBuilder.Append("<br/><br/><p>Best Regards,<br>ShopEase Team</p></div></body></html>");
+
+            var body = stringBuilder.ToString();
+            body = body.Replace("{otp}", otp);
+            body = body.Replace("{otpLifeSpan}", _otpLifeSpan.ToString());
+
+            return body;
+        }
+
+        /// <summary>
+        /// To Prepare the Email Body for VerifyEmail Scenario
+        /// </summary>
+        /// <param name="otp"></param>
+        /// <returns></returns>
+        private string PrepareEmailBodyForPasswordReset(string otp)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.Append("<html lang='en'><head><style>body{font-family:Arial,sans-serif;line-height:1.6;background-color:#f4f4f4;margin:0;padding:20px;}");
+            stringBuilder.Append(".container{max-width:600px;margin:auto;background:#fff;padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.1);}");
+            stringBuilder.Append(".btn{display:inline-block;background:#007bff;color:#fff;text-decoration:none;padding:10px 20px;border-radius:5px;}</style></head>");
+            stringBuilder.Append("<body><div class='container'><h2>Forgot Password</h2>");
+            stringBuilder.Append("<p>You recently requested to reset your password for your ShopEase account. Use the following OTP to reset your password: </p><h3> {otp} </h3>");
+            stringBuilder.Append("<br/><p>This OTP is valid for only {otpLifeSpan} minutes.</p>");
+            stringBuilder.Append("<p>If you didn't request a password reset, you can safely ignore this email.</p>");
+            stringBuilder.Append("<br/><br/><p>Best Regards,<br>ShopEase Team</p></div></body></html>");
+
+            var body = stringBuilder.ToString();
+            body = body.Replace("{otp}", otp);
+            body = body.Replace("{otpLifeSpan}", _otpLifeSpan.ToString());
+
+            return body;
+        }
+
+        /// <summary>
+        /// To Prepare the Email Body for Login Scenario
+        /// </summary>
+        /// <param name="otp"></param>
+        /// <returns></returns>
+        private string PrepareEmailBodyForLogin(string otp)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.Append("<html lang='en'><head><style>body{font-family:Arial,sans-serif;line-height:1.6;background-color:#f4f4f4;margin:0;padding:20px;}");
+            stringBuilder.Append(".container{max-width:600px;margin:auto;background:#fff;padding:20px;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.1);}");
+            stringBuilder.Append(".btn{display:inline-block;background:#007bff;color:#fff;text-decoration:none;padding:10px 20px;border-radius:5px;}</style></head>");
+            stringBuilder.Append("<body><div class='container'><h2>Login with OTP</h2>");
+            stringBuilder.Append("<p>You are attempting to login to your ShopEase account. Please use the following OTP: </p><h3> {otp} </h3>");
+            stringBuilder.Append("<br/><p>This OTP is valid for only {otpLifeSpan} minutes.</p>");
+            stringBuilder.Append("<p>If you didn't request this OTP, please ignore this email.</p>");
             stringBuilder.Append("<br/><br/><p>Best Regards,<br>ShopEase Team</p></div></body></html>");
 
             var body = stringBuilder.ToString();

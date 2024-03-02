@@ -4,6 +4,9 @@ using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
 using ShopEase.Backend.AuthService.Application.Models;
 using ShopEase.Backend.AuthService.Application.Queries;
+using ShopEase.Backend.AuthService.Core.Primitives;
+using static ShopEase.Backend.AuthService.Core.CommonConstants.EmailConstants;
+using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
 namespace ShopEase.Backend.AuthService.API.Controllers
 {
@@ -155,6 +158,101 @@ namespace ShopEase.Backend.AuthService.API.Controllers
             }
         }
 
+        /// <summary>
+        /// To Login a user
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("login/otp")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> LoginUsingOtp([FromBody] ValidateOtpRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: RequestEmpty, ErrorMessage: Request is empty. Please provide valid request.");
+                }                                
+                else
+                {
+                    var result = await _apiService.SendAsync(new ValidateOtpCommand(request));
+
+                    if (result.IsFailure)
+                    {
+                        return Unauthorized($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+                    }
+                    else
+                    {
+                        var tokenResult = await _apiService.SendAsync(new GenerateJWTCommand(request.Email));
+
+                        if (tokenResult.IsSuccess)
+                        {
+                            return Ok(tokenResult.Value);
+                        }
+                        else
+                        {
+                            return StatusCode(500, $"ErrorCode: {tokenResult.Error?.Code}, ErrorMessage: {tokenResult.Error?.Message}");
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during Login. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
+        #endregion
+
+        #region Password
+
+        /// <summary>
+        /// Reset Password using old password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPut]
+        [Route("password/reset")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: RequestEmpty, ErrorMessage: Request is empty. Please provide valid request.");
+                }
+                else
+                {
+                    var result = await _apiService.SendAsync(new ResetPasswordCommand(request));
+
+                    if (result.IsSuccess)
+                    {
+                        return Ok("Password Changed Successfully!");
+                    }
+
+                    return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during ResetPassword. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
         #endregion
 
         #region Refresh Token
@@ -281,15 +379,15 @@ namespace ShopEase.Backend.AuthService.API.Controllers
         #region OTP
 
         /// <summary>
-        /// To Generate Otp
+        /// To Send Otp For Email Verification
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("otp/generate/{email}")]
+        [Route("email/send-otp/{email}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GenerateOtp(string email)
+        public async Task<IActionResult> SendOtpForEmailVerification(string email)
         {
             try
             {
@@ -298,7 +396,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                     return BadRequest($"ErrorCode: InvalidEmail, ErrorMessage: Please provide valid UserEmail.");
                 }
 
-                var result = await _apiService.SendAsync(new SendOtpCommand(email));
+                var result = await _apiService.SendAsync(new SendOtpCommand(email, OTPType.VerifyEmail));
 
                 if (result.IsSuccess)
                 {
@@ -307,10 +405,95 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
                 return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                return BadRequest($"Exception occured during SendOtpForEmailVerification. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
 
-                throw;
+        /// <summary>
+        /// To Send Otp To Reset Password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("password/reset/send-otp/{email}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SendOtpToResetPassword(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest($"ErrorCode: InvalidEmail, ErrorMessage: Please provide valid UserEmail.");
+                }
+
+                var result = await _apiService.SendAsync(new SendOtpCommand(email, OTPType.ResetPassword));
+
+                if (result.IsSuccess)
+                {
+                    return Ok($"Otp sent successfully to the following email address: {email}");
+                }
+
+                return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during SendOtpToResetPassword. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
+        /// <summary>
+        /// To Send Otp For Login Without Password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("login/send-otp/{email}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SendOtpForLogin(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest($"ErrorCode: InvalidEmail, ErrorMessage: Please provide valid UserEmail.");
+                }
+
+                var isUserExists = await _apiService.RequestAsync(new IsUserExistQuery(email));
+
+                if (isUserExists.IsFailure)
+                {
+                    return BadRequest($"ErrorCode: {isUserExists.Error?.Code}, ErrorMessage: {isUserExists.Error?.Message}");
+                }
+                else
+                {
+                    if (isUserExists.Value)
+                    {
+                        var result = await _apiService.SendAsync(new SendOtpCommand(email, OTPType.Login));
+
+                        if (result.IsSuccess)
+                        {
+                            return Ok($"Otp sent successfully to the following email address: {email}");
+                        }
+
+                        return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+                    }
+
+                    return BadRequest($"ErrorCode: {OtpErrors.UserDoesntExists.Code}, ErrorMessage: {OtpErrors.UserDoesntExists.Message}");
+                }                
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during SendOtpForLogin. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
             }
         }
 
@@ -341,10 +524,47 @@ namespace ShopEase.Backend.AuthService.API.Controllers
 
                 return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                return BadRequest($"Exception occured during ValidateOtp. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
 
-                throw;
+        /// <summary>
+        /// To Validate Otp For Password Reset
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("password/reset/validate-otp")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ValidateOtpForResetPassword(ValidateOtpRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: InvalidRequest, ErrorMessage: Please provide valid Request.");
+                }
+
+                var result = await _apiService.SendAsync(new ValidateOtpCommand(request));
+
+                if (result.IsSuccess)
+                {
+                    var resetPasswordToken = await _apiService.SendAsync(new GenerateResetPasswordTokenCommand(request.Email));
+                    return Ok(resetPasswordToken);
+                }
+
+                return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during ValidateOtp. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
             }
         }
 

@@ -35,6 +35,13 @@ namespace ShopEase.Backend.AuthService.Application.Abstractions
         UserCredentials? GetUserCredentials(Guid userId);
 
         /// <summary>
+        /// To check if user exists By User Email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        bool IsUserExists(string email);
+
+        /// <summary>
         /// To Update UserCredentials
         /// </summary>
         /// <param name="userCredentials"></param>
