@@ -7,6 +7,7 @@ using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Helper;
 using ShopEase.Backend.AuthService.Infrastructure;
 using ShopEase.Backend.AuthService.Infrastructure.MailService;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,8 +58,9 @@ builder.Services.AddSwaggerGen(s =>
 {
     s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Title = "ShopEase AuthServices API",
         Version = "v1",
+        Title = "ShopEase AuthServices API",
+        Description = "APIs for ShopEase AuthServices",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
             Name = "Kaustab Samanta",
@@ -66,6 +68,11 @@ builder.Services.AddSwaggerGen(s =>
             Url = new Uri("https://www.linkedin.com/in/kaustab-samanta-b513511a1")
         }
     });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    s.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
@@ -74,7 +81,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(s => s.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopEase AuthServices API V1"));
 }
 
 app.UseHttpsRedirection();

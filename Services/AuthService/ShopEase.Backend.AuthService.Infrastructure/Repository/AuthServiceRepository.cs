@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopEase.Backend.AuthService.Application.Abstractions;
 using ShopEase.Backend.AuthService.Core.Entities;
-using System.Security;
-using System.Xml.Schema;
 
 namespace ShopEase.Backend.AuthService.Infrastructure
 {

@@ -52,6 +52,13 @@ namespace ShopEase.Backend.AuthService.Application.Abstractions
         /// <param name="token"></param>
         /// <returns></returns>
         bool VerifyResetPasswordToken(string email, string token);
+
+        /// <summary>
+        /// To Validate ClientSecret
+        /// </summary>
+        /// <param name="clientSecret"></param>
+        /// <returns></returns>
+        bool ValidateClientSecret(string clientSecret);
     }
 
 }

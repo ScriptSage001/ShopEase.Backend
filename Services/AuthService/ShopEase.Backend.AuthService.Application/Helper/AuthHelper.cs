@@ -204,6 +204,16 @@ namespace ShopEase.Backend.AuthService.Application.Helper
                         && expiresOn >= DateTime.UtcNow);
         }
 
+        /// <summary>
+        /// To Validate ClientSecret
+        /// </summary>
+        /// <param name="clientSecret"></param>
+        /// <returns></returns>
+        public bool ValidateClientSecret(string clientSecret)
+        {
+            return _appSettings.ClientSecret.Equals(clientSecret);
+        }
+
         #endregion
 
         #region Private Methods
