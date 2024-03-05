@@ -12,9 +12,17 @@ namespace ShopEase.Backend.AuthService.Core.CustomErrors
 
         public struct LoginUserErrors
         {
-            public static Error UserDoesntExists = new("UserDoesntExists", "GetUser failed because user doesn't exists.");
-            public static Error UserInactive = new("UserInactive", "GetUser failed because user is inactive.");
+            public static Error UserDoesntExists = new("UserDoesntExists", "Login failed because user doesn't exists.");
+            public static Error UserInactive = new("UserInactive", "Login failed because user is inactive.");
             public static Error IncorrectPassword = new("IncorrectPassword", "Login failed because password is incorrect.");
+        }
+
+        public struct ResetPasswordErrors
+        {
+            public static Error UserDoesntExists = new("UserDoesntExists", "ResetPassword failed because user doesn't exists.");
+            public static Error UserInactive = new("UserInactive", "ResetPassword failed because user is inactive.");
+            public static Error IncorrectPassword = new("IncorrectPassword", "ResetPassword failed because password is incorrect.");
+            public static Error IncorrectToken = new("IncorrectToken", "ResetPassword failed because password reset token is incorrect.");
         }
 
         public struct AuthErrors

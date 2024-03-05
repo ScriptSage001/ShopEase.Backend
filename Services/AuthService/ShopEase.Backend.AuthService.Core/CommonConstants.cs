@@ -42,6 +42,7 @@ namespace ShopEase.Backend.AuthService.Core
             public struct ClaimTypeValue
             {
                 public const string ResetPassword = "ResetPassword";
+                public const string AccessToken = "AccessToken";
             }
         }
     }

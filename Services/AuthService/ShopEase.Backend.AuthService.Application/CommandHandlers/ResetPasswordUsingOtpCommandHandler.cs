@@ -6,7 +6,7 @@ using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
 namespace ShopEase.Backend.AuthService.Application.CommandHandlers
 {
-    internal sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswordCommand>
+    internal sealed class ResetPasswordUsingOtpCommandHandler : ICommandHandler<ResetPasswordUsingOtpCommand>
     {
         #region Variables
 
@@ -25,11 +25,11 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         #region Constructor
 
         /// <summary>
-        /// Constructor for ResetPasswordCommandHandler
+        /// Constructor for ResetPasswordUsingOtpCommandHandler
         /// </summary>
         /// <param name="authHelper"></param>
         /// <param name="authServiceRepository"></param>
-        public ResetPasswordCommandHandler(IAuthHelper authHelper, IAuthServiceRepository authServiceRepository)
+        public ResetPasswordUsingOtpCommandHandler(IAuthHelper authHelper, IAuthServiceRepository authServiceRepository)
         {
             _authHelper = authHelper;
             _authServiceRepository = authServiceRepository;
@@ -41,18 +41,18 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         #region Handle Method
 
         /// <summary>
-        /// Handler Method for ResetPasswordCommand
+        /// Handler Method for ResetPasswordUsingOtpCommand
         /// </summary>
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<Result> Handle(ResetPasswordCommand command, CancellationToken cancellationToken)
+        public async Task<Result> Handle(ResetPasswordUsingOtpCommand command, CancellationToken cancellationToken)
         {
             var userCreds = _authServiceRepository.GetUserCredentials(command.Request.Email);
 
             if (userCreds != null)
             {
-                var isVerified = _authHelper.VerifyPasswordHash(command.Request.OldPassword, userCreds.PasswordHash, userCreds.PasswordSalt);
+                var isVerified = _authHelper.VerifyResetPasswordToken(command.Request.Email, command.Request.ResetPasswordToken);
 
                 if (isVerified)
                 {
@@ -68,7 +68,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
                 }
                 else
                 {
-                    return Result.Failure(ResetPasswordErrors.IncorrectPassword);
+                    return Result.Failure(ResetPasswordErrors.IncorrectToken);
                 }
             }
             else

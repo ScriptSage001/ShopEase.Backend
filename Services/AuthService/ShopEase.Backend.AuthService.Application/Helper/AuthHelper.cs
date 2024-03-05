@@ -172,8 +172,8 @@ namespace ShopEase.Backend.AuthService.Application.Helper
             {
                 Subject = new ClaimsIdentity(claims.ToArray()),
                 Issuer = _appSettings.Issuer,
-                NotBefore = DateTime.Now,
-                Expires = DateTime.Now.AddMinutes(tokenExpirationTime == 0 ? 5 : tokenExpirationTime),
+                NotBefore = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddMinutes(tokenExpirationTime == 0 ? 5 : tokenExpirationTime),
                 SigningCredentials = credentials
             };
 
@@ -201,7 +201,7 @@ namespace ShopEase.Backend.AuthService.Application.Helper
 
             return (email.Equals(userEmail, StringComparison.OrdinalIgnoreCase) 
                         && ClaimTypeValue.ResetPassword.Equals(tokenType, StringComparison.OrdinalIgnoreCase) 
-                        && expiresOn >= DateTime.Now);
+                        && expiresOn >= DateTime.UtcNow);
         }
 
         #endregion
@@ -218,7 +218,8 @@ namespace ShopEase.Backend.AuthService.Application.Helper
         {
             List<Claim> claims =
             [
-                new Claim(ClaimType.Email, email)
+                new Claim(ClaimType.Email, email),
+                new Claim(ClaimType.TokenType, ClaimTypeValue.AccessToken)
             ];
 
             var key = Encoding.UTF8.GetBytes(_appSettings.Secret);
@@ -231,8 +232,8 @@ namespace ShopEase.Backend.AuthService.Application.Helper
             {
                 Subject = new ClaimsIdentity(claims.ToArray()),
                 Issuer = _appSettings.Issuer,
-                NotBefore = DateTime.Now,
-                Expires = DateTime.Now.AddMinutes(tokenExpirationTime == 0 ? 1440 : tokenExpirationTime),
+                NotBefore = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddMinutes(tokenExpirationTime == 0 ? 1440 : tokenExpirationTime),
                 SigningCredentials = credentials
             };
 

@@ -4,7 +4,6 @@ using ShopEase.Backend.AuthService.Application.Abstractions.ExplicitMediator;
 using ShopEase.Backend.AuthService.Application.Commands;
 using ShopEase.Backend.AuthService.Application.Models;
 using ShopEase.Backend.AuthService.Application.Queries;
-using ShopEase.Backend.AuthService.Core.Primitives;
 using static ShopEase.Backend.AuthService.Core.CommonConstants.EmailConstants;
 using static ShopEase.Backend.AuthService.Core.CustomErrors.CustomErrors;
 
@@ -236,6 +235,45 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                 else
                 {
                     var result = await _apiService.SendAsync(new ResetPasswordCommand(request));
+
+                    if (result.IsSuccess)
+                    {
+                        return Ok("Password Changed Successfully!");
+                    }
+
+                    return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Exception occured during ResetPassword. Message: {ex.Message}. " +
+                                    $"Stack Trace: {ex.StackTrace}. Inner Exception: {ex.InnerException?.ToString()}");
+                // Tech Debt - Add logging, reduce details from return statement.
+            }
+        }
+
+        /// <summary>
+        /// Reset Password using OTP
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("password/reset/otp")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> ResetPasswordUsingOtp([FromBody] ResetPasswordUsingOtpRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest($"ErrorCode: RequestEmpty, ErrorMessage: Request is empty. Please provide valid request.");
+                }
+                else
+                {
+                    var result = await _apiService.SendAsync(new ResetPasswordUsingOtpCommand(request));
 
                     if (result.IsSuccess)
                     {
@@ -555,7 +593,7 @@ namespace ShopEase.Backend.AuthService.API.Controllers
                 if (result.IsSuccess)
                 {
                     var resetPasswordToken = await _apiService.SendAsync(new GenerateResetPasswordTokenCommand(request.Email));
-                    return Ok(resetPasswordToken);
+                    return Ok(resetPasswordToken.Value);
                 }
 
                 return BadRequest($"ErrorCode: {result.Error?.Code}, ErrorMessage: {result.Error?.Message}");
