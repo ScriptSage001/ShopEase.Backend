@@ -7,16 +7,7 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="email"></param>
-    public sealed record RevokeRefreshTokenCommand(Guid? userId, string? email) : ICommand
+    public sealed record RevokeRefreshTokenCommand(Guid? UserId, string? Email) : ICommand
     {
-        /// <summary>
-        /// UserId
-        /// </summary>
-        public Guid? UserId { get; set; } = userId;
-
-        /// <summary>
-        /// User Enail
-        /// </summary>
-        public string? Email { get; set; } = email;
     }
 }

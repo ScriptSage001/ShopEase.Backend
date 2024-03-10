@@ -9,9 +9,5 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// <param name="Request"></param>
     public sealed record ValidateOtpCommand(ValidateOtpRequest Request) : ICommand
     {
-        /// <summary>
-        /// ValidateOtpRequest
-        /// </summary>
-        public ValidateOtpRequest Request { get; set; } = Request; 
     }
 }

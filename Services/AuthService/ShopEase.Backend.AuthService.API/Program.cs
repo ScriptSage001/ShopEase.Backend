@@ -36,7 +36,7 @@ builder.Services.AddScoped<IApiService, ApiService>(c =>
 builder.Services.AddScoped<IAuthHelper, AuthHelper>();
 
 // Adding Email Service
-builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -78,11 +78,14 @@ builder.Services.AddSwaggerGen(s =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(s => s.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopEase AuthServices API V1"));
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI(s => s.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopEase AuthServices API V1"));
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI(s => s.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopEase AuthServices API V1"));
 
 app.UseHttpsRedirection();
 

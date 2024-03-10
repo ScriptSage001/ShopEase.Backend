@@ -9,9 +9,5 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// <param name="ClientCredentials"></param>
     public sealed record GenerateTokenByClientSecretCommand(ClientCredentials ClientCredentials) : ICommand<TokenModel>
     {
-        /// <summary>
-        /// To get or init ClientCredentials
-        /// </summary>
-        public ClientCredentials ClientCredentials { get; init; } = ClientCredentials;
     }
 }

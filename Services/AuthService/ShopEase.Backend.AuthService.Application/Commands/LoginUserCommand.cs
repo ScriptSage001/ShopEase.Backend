@@ -7,11 +7,7 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// Command for User Login
     /// </summary>
     /// <param name="userLogin"></param>
-    public sealed record LoginUserCommand(UserCredentialsDto userCredentials) : ICommand
+    public sealed record LoginUserCommand(UserCredentialsDto UserCredentials) : ICommand
     {
-        /// <summary>
-        /// UserCredentials DTO
-        /// </summary>
-        public UserCredentialsDto UserCredentials { get; set; } = userCredentials;
     }
 }

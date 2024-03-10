@@ -9,9 +9,5 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// <param name="Request"></param>
     public sealed record ResetPasswordCommand(ResetPasswordRequest Request) : ICommand
     {
-        /// <summary>
-        /// To get or set ResetPasswordRequest
-        /// </summary>
-        public ResetPasswordRequest Request { get; set; } = Request;
     }
 }

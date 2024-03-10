@@ -7,11 +7,7 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// Command to Generate new JWT
     /// </summary>
     /// <param name="email"></param>
-    public sealed record GenerateJWTCommand(string email) : ICommand<TokenModel>
+    public sealed record GenerateJWTCommand(string Email) : ICommand<TokenModel>
     {
-        /// <summary>
-        /// Users Email
-        /// </summary>
-        public string Email { get; set; } = email;
     }
 }

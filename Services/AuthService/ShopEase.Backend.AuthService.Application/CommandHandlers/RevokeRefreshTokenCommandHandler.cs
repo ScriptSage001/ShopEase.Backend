@@ -40,7 +40,7 @@ namespace ShopEase.Backend.AuthService.Application.CommandHandlers
         /// <returns></returns>
         public async Task<Result> Handle(RevokeRefreshTokenCommand command, CancellationToken cancellationToken)
         {
-            var userCreds = command.userId != null ? 
+            var userCreds = command.UserId != null ? 
                                     _authServiceRepository.GetUserCredentials((Guid)command.UserId) : 
                                     _authServiceRepository.GetUserCredentials(command.Email);
 

@@ -7,9 +7,5 @@ namespace ShopEase.Backend.AuthService.Application.Queries
     /// </summary>
     public sealed record IsUserExistQuery(string Email) : IQuery<bool>
     {
-        /// <summary>
-        /// To get or set Email 
-        /// </summary>
-        public string Email { get; set; } = Email;
     }
 }

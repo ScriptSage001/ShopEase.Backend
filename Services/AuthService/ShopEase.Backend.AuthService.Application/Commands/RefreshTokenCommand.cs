@@ -3,8 +3,11 @@ using ShopEase.Backend.AuthService.Application.Models;
 
 namespace ShopEase.Backend.AuthService.Application.Commands
 {
-    public sealed record RefreshTokenCommand(RefreshTokenRequest request) : ICommand<TokenModel>
+    /// <summary>
+    /// Command to Refresh Token
+    /// </summary>
+    /// <param name="Request"></param>
+    public sealed record RefreshTokenCommand(RefreshTokenRequest Request) : ICommand<TokenModel>
     {
-        public RefreshTokenRequest Request { get; set; } = request;
     }
 }

@@ -9,14 +9,5 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// <param name="Email"></param>
     public sealed record SendWelcomeMailCommand(string Name, string Email) : ICommand
     {
-        /// <summary>
-        /// User's Full Name
-        /// </summary>
-        public string Name { get; set; } = Name;
-
-        /// <summary>
-        /// Recipients Email
-        /// </summary>
-        public string Email { get; set; } = Email;
     }
 }

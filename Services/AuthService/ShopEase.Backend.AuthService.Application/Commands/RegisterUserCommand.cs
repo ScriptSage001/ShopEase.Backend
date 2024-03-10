@@ -7,11 +7,7 @@ namespace ShopEase.Backend.AuthService.Application.Commands
     /// Command to Register User
     /// </summary>
     /// <param name="userRegister"></param>
-    public sealed record RegisterUserCommand(UserRegisterDto userRegister) : ICommand
+    public sealed record RegisterUserCommand(UserRegisterDto UserRegister) : ICommand
     {
-        /// <summary>
-        /// User Register DTO
-        /// </summary>
-        public UserRegisterDto UserRegister { get; set; } = userRegister;
     }
 }
